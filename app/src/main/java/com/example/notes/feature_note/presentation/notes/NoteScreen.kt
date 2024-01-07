@@ -48,11 +48,11 @@ fun NoteScreen(
     viewModel: NotesViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.value
-    val snackBarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackBarHostState) },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -116,7 +116,7 @@ fun NoteScreen(
                         onDeleteClick = {
                             viewModel.onEvent(NotesEvent.DeleteNote(note))
                             scope.launch{
-                                val result = snackBarHostState.showSnackbar(
+                                val result = snackbarHostState.showSnackbar(
                                     message = "Note deleted",
                                     actionLabel = "unod"
                                 )
