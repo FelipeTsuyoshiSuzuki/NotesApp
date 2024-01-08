@@ -84,17 +84,19 @@ fun AddEditNoteScreen(
                 onClick = {
                     viewModel.onEvent(AddEditNoteEvent.SaveNote)
                 },
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(16.dp)
             ) {
                 Icon(imageVector = Icons.Default.Save, contentDescription = "Save Note")
             }
         }
-    ) {
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(noteBackgroundAnimatable.value)
-                .padding(it)
+                .padding(padding)
+                .padding(16.dp)
         ) {
             Row(
                modifier = Modifier
@@ -102,7 +104,7 @@ fun AddEditNoteScreen(
                    .padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Note.noteColors.forEach {color ->
+                Note.noteColors.forEach { color ->
                     val colorInt = color.toArgb()
                     Box(
                         modifier = Modifier
@@ -156,7 +158,7 @@ fun AddEditNoteScreen(
                 onFocusChange = { focus ->
                     viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(focus))
                 },
-                isHintVisible = titleState.isHintVisisble,
+                isHintVisible = contentState.isHintVisisble,
                 singleLine = false,
                 textStyle = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.fillMaxHeight()
