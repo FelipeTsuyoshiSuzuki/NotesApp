@@ -16,12 +16,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -35,9 +40,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getString
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.notes.R
 import com.example.notes.feature_note.domain.model.Note
 import com.example.notes.feature_note.presentation.add_edit_note.components.TransparentHintTextField
 import kotlinx.coroutines.flow.collectLatest
@@ -50,6 +58,7 @@ fun AddEditNoteScreen(
     noteColor: Int,
     viewModel: addEditNoteViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val titleState = viewModel.noteTitle.value
     val contentState = viewModel.noteContent.value
 
@@ -96,47 +105,62 @@ fun AddEditNoteScreen(
                 .fillMaxSize()
                 .background(noteBackgroundAnimatable.value)
                 .padding(padding)
-                .padding(16.dp)
+                .padding(vertical = 16.dp)
         ) {
+            IconButton(
+                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
+                onClick = {
+                    navController.popBackStack()
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back Arrow",
+                    tint = MaterialTheme.colorScheme.inverseOnSurface
+                )
+            }
             Row(
                modifier = Modifier
-                   .fillMaxWidth()
-                   .padding(8.dp),
+                   .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Note.noteColors.forEach { color ->
-                    val colorInt = color.toArgb()
-                    Box(
-                        modifier = Modifier
-                            .size(50.dp)
-                            .shadow(15.dp, CircleShape)
-                            .clip(CircleShape)
-                            .background(color)
-                            .border(
-                                width = 3.dp,
-                                color = if (viewModel.noteColor.value == colorInt) {
-                                    Color.Black
-                                } else Color.Transparent,
-                                shape = CircleShape
-                            )
-                            .clickable {
-                                scope.launch {
-                                    noteBackgroundAnimatable.animateTo(
-                                        targetValue = Color(colorInt),
-                                        animationSpec = tween(
-                                            durationMillis = 500
+                LazyRow(modifier = Modifier.fillMaxWidth()) {
+                    items(Note.noteColors) { color ->
+                        val colorInt = color.toArgb()
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 16.dp)
+                                .size(50.dp)
+                                .shadow(15.dp, CircleShape)
+                                .clip(CircleShape)
+                                .background(color)
+                                .border(
+                                    width = 3.dp,
+                                    color = if (viewModel.noteColor.value == colorInt) {
+                                        Color.Black
+                                    } else Color.Transparent,
+                                    shape = CircleShape
+                                )
+                                .clickable {
+                                    scope.launch {
+                                        noteBackgroundAnimatable.animateTo(
+                                            targetValue = Color(colorInt),
+                                            animationSpec = tween(
+                                                durationMillis = 500
+                                            )
                                         )
-                                    )
+                                    }
+                                    viewModel.onEvent(AddEditNoteEvent.ChangeColor(colorInt))
                                 }
-                                viewModel.onEvent(AddEditNoteEvent.ChangeColor(colorInt))
-                            }
-                    )
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
             TransparentHintTextField(
                 text = titleState.text,
-                hint = titleState.hint,
+                hint = getString(context, R.string.note_title_hint),
                 onValueChange = { title ->
                                 viewModel.onEvent(AddEditNoteEvent.EnteredTitle(title))
                 },
@@ -145,13 +169,14 @@ fun AddEditNoteScreen(
                 },
                 isHintVisible = titleState.isHintVisisble,
                 singleLine = true,
-                textStyle = MaterialTheme.typography.headlineSmall
+                textStyle = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
             TransparentHintTextField(
                 text = contentState.text,
-                hint = contentState.hint,
+                hint = getString(context, R.string.note_content_hint),
                 onValueChange = { content ->
                     viewModel.onEvent(AddEditNoteEvent.EnteredContent(content))
                 },
@@ -161,7 +186,9 @@ fun AddEditNoteScreen(
                 isHintVisible = contentState.isHintVisisble,
                 singleLine = false,
                 textStyle = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = 16.dp)
             )
         }
     }

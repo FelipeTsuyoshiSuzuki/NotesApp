@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Notes</string>
+    <string name="note_screen_title">Anotações</string>
+    <string name="title_string">Titulo</string>
+    <string name="date_string">Data</string>
+    <string name="color_string">Cor</string>
+    <string name="note_title_hint">Escreva um titulo…</string>
+    <string name="note_content_hint">Escreva sua anotação…</string>
+    <string name="undo">Desfazer</string>
+    <string name="deleted_note">Anotação Deletada</string>
 </resources>
