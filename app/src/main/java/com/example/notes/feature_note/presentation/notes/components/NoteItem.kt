@@ -1,5 +1,7 @@
 package com.example.notes.feature_note.presentation.notes.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +29,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.example.notes.feature_note.domain.model.Note
+import com.example.notes.feature_note.presentation.utils.dateFormat
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NoteItem(
     note: Note,
@@ -83,6 +87,14 @@ fun NoteItem(
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.inverseOnSurface,
                 maxLines = 10,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = note.timestamp.dateFormat(),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.inverseOnSurface,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
