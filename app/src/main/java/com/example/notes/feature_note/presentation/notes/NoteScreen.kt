@@ -1,10 +1,15 @@
 package com.example.notes.feature_note.presentation.notes
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Sort
@@ -42,7 +48,8 @@ import com.example.notes.feature_note.presentation.notes.components.OrderSection
 import com.example.notes.feature_note.presentation.utils.Screens
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun NoteScreen(
     navController: NavController,
@@ -51,6 +58,7 @@ fun NoteScreen(
     val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -93,8 +101,8 @@ fun NoteScreen(
             }
             AnimatedVisibility(
                 visible = state.isOrderSectionVisible,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically()
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
             ) {
                 OrderSection(
                     modifier = Modifier
@@ -107,8 +115,8 @@ fun NoteScreen(
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(state.notes) { note ->
+            LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
+                items(items = state.notes, key = { it.id ?: 0 }) { note ->
                     NoteItem(
                         note = note,
                         modifier = Modifier
@@ -116,15 +124,18 @@ fun NoteScreen(
                             .clickable {
                                 navController.navigate(
                                     Screens.AddEditNoteScreen.route +
-                                    "?noteId=${note.id}&noteColor=${note.color}"
+                                            "?noteId=${note.id}&noteColor=${note.color}"
                                 )
-                            },
+                            }
+                            .animateItemPlacement(
+                                tween(500, easing = FastOutSlowInEasing)
+                            ),
                         onDeleteClick = {
                             viewModel.onEvent(NotesEvent.DeleteNote(note))
                             scope.launch{
                                 val result = snackbarHostState.showSnackbar(
                                     message = "Note deleted",
-                                    actionLabel = "unod"
+                                    actionLabel = "undo"
                                 )
                                 if (result == SnackbarResult.ActionPerformed) {
                                     viewModel.onEvent(NotesEvent.RestoreNote)
