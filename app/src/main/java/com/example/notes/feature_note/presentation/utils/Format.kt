@@ -7,8 +7,9 @@ import java.util.Date
 import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun Long.dateFormat(): String {
-    val date = Date(this)
+fun formatDate(timestamp: Long): String {
+    val date = Date(timestamp)
     val format = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
     return format.format(date)
+
 }
