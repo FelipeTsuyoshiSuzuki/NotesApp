@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.example.notes.feature_note.domain.model.Note
-import com.example.notes.feature_note.presentation.utils.dateFormat
+import com.example.notes.feature_note.presentation.utils.formatDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -91,7 +91,7 @@ fun NoteItem(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = note.timestamp.dateFormat(),
+                text = formatDate(note.timestamp),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.inverseOnSurface,
                 maxLines = 1,
